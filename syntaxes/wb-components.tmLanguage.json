@@ -2,29 +2,41 @@
     "scopeName": "text.md.wb-components",
     "injectionSelector": "L:text.html.markdown",
     "patterns": [
-        {
-            "begin": ":(?=[a-z])[a-z][\\w-]*\\{",
-            "end": "\\}",
-            "name": "meta.component.wb",
-            "beginCaptures": {
-                "0": {
-                    "name": "entity.name.tag.html"
-                }
-            },
-            "patterns": [
-                {
-                    "match": "(\\w+)\\s*=",
-                    "name": "entity.other.attribute-name.html"
-                },
-                {
-                    "match": "\"(.*?)\"|'(.*?)'",
-                    "name": "string.quoted.double.markdown"
-                },
-                {
-                    "match": "\\[([^\\]]+)\\]",
-                    "name": "constant.array.wb"
-                }
-            ]
-        }
+      {
+        "begin": "\\bdata\\s*=\\s*'(?=\\[)",
+        "beginCaptures": {
+          "0": { "name": "punctuation.definition.string.begin.markdown" }
+        },
+        "end": "'",
+        "endCaptures": {
+          "0": { "name": "punctuation.definition.string.end.markdown" }
+        },
+        "name": "meta.embedded.json.markdown",
+        "patterns": [
+          { "include": "source.json" }
+        ]
+      },
+      {
+        "begin": ":(?=[a-z])[a-z][\\w-]*\\{",
+        "beginCaptures": {
+          "0": { "name": "entity.name.tag.markdown" }
+        },
+        "end": "\\}",
+        "endCaptures": {
+          "0": { "name": "punctuation.definition.tag.markdown" }
+        },
+        "name": "meta.component.markdown",
+        "patterns": [
+          {
+            "match": "(\\w+)\\s*=",
+            "name": "entity.other.attribute-name.markdown"
+          },
+          {
+            "match": "\"(.*?)\"|'(.*?)'",
+            "name": "string.quoted.double.markdown"
+          }
+        ]
+      }
     ]
-}
+  }
+  
