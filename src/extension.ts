@@ -8,9 +8,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
-      'markdown',
+      { language: 'markdown', scheme: 'file' },
       new WBCompletionProvider(),
-      ':'
+      ':' // автозапуск после символа :
     )
   );
 }

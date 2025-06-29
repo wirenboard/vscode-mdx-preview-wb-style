@@ -3,11 +3,11 @@
     "injectionSelector": "L:text.html.markdown",
     "patterns": [
         {
-            "begin": "(:\\w+)\\{",
+            "begin": ":(?=[a-z])[a-z][\\w-]*\\{",
             "end": "\\}",
             "name": "meta.component.wb",
             "beginCaptures": {
-                "1": {
+                "0": {
                     "name": "entity.name.tag.html"
                 }
             },

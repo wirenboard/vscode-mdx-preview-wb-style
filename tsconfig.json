@@ -7,8 +7,8 @@
     "strict": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "sourceMap": true
-    
+    "sourceMap": true,        
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src"],
   "exclude": ["node_modules", ".vscode-test"]
