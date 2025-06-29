@@ -15,45 +15,58 @@ interface CompInfo {
 
 const attributeDocs: Record<string, AttrInfo> = {};
 const componentDocs: Record<string, CompInfo> = {};
-
-
-Object.entries(componentDefs).forEach(([compName, compDef]: [string, any]) => {
-  componentDocs[compName] = {
-    description: compDef.description,
-    attributes: compDef.attributes ? Object.keys(compDef.attributes) : []
-  };
-  if (compDef.attributes) {
-    Object.entries(compDef.attributes).forEach(([attrName, attrDef]: [string, any]) => {
-      attributeDocs[attrName] = {
-        description: attrDef.description,
-        default: attrDef.default,
-        values: attrDef.values
-      };
-    });
-  }
-});
-
-
 const templateDocs: Record<string, CompInfo> = {};
-Object.entries(templateDefs).forEach(([key, tpl]: [string, any]) => {
-  const m = key.match(/^wbs-md-(.+)$/);
-  if (!m) return;
-  const name = m[1];
-  const firstLine = Array.isArray(tpl.body) ? tpl.body[0] : tpl.body;
 
-  const attrs = [...firstLine.matchAll(/(\w+)=/g)].map(([_, attr]) => attr);
-  templateDocs[name] = {
-    description: tpl.description,
-    attributes: attrs
-  };
-});
+/**
+ * Из JSON-дефиниций (components.json или templates.json) заполняет:
+ *  - targetDocs: описание компонентов/шаблонов
+ *  - attributeDocs: описание атрибутов
+ */
+function loadDefinitions(defs: Record<string, any>, targetDocs: Record<string, CompInfo>) {
+  for (const key of Object.keys(defs)) {
+    const def = defs[key];
+    // тело сниппета может быть строкой или массивом строк
+    const bodyLines = Array.isArray(def.body) ? def.body : [def.body];
+    const firstLine = String(bodyLines[0]);
+    const m = firstLine.match(/^:([a-z][\w-]*)\{/i);
+    if (!m) {
+      continue;
+    }
+    const name = m[1]; // реальное имя компонента/шаблона
+
+    // Собираем описание компонента/шаблона
+    const attrs = def.attributes && typeof def.attributes === 'object'
+      ? Object.keys(def.attributes)
+      : [];
+    targetDocs[name] = {
+      description: String(def.description),
+      attributes: attrs
+    };
+
+    // Собираем описание атрибутов
+    if (def.attributes && typeof def.attributes === 'object') {
+      for (const attrName of Object.keys(def.attributes)) {
+        const attrDef = def.attributes[attrName];
+        attributeDocs[attrName] = {
+          description: String(attrDef.description),
+          default: attrDef.default,
+          values: Array.isArray(attrDef.values) ? attrDef.values : undefined
+        };
+      }
+    }
+  }
+}
+
+// Загружаем компоненты и шаблоны
+loadDefinitions(componentDefs, componentDocs);
+loadDefinitions(templateDefs, templateDocs);
 
 export class WBHoverProvider implements vscode.HoverProvider {
   provideHover(
     document: vscode.TextDocument,
     position: vscode.Position
   ): vscode.ProviderResult<vscode.Hover> {
-
+    // 1) Hover по атрибутам
     const attrRange = document.getWordRangeAtPosition(position, /[a-zA-Z-]+/);
     if (attrRange) {
       const attr = document.getText(attrRange);
@@ -61,7 +74,7 @@ export class WBHoverProvider implements vscode.HoverProvider {
       if (info) {
         const md = new vscode.MarkdownString(
           `**${attr}** — ${info.description}\n\n` +
-          `**Значения:** ${info.values?.join(', ') ?? '—'}  \n` +
+          `**Возможные значения:** ${info.values?.join(', ') ?? '—'}  \n` +
           `**По умолчанию:** ${info.default ?? '—'}`
         );
         md.isTrusted = true;
@@ -69,7 +82,7 @@ export class WBHoverProvider implements vscode.HoverProvider {
       }
     }
 
-
+    // 2) Hover по компоненту или шаблону (должен быть префикс ":")
     const compRange = document.getWordRangeAtPosition(position, /[a-z][\w-]*/i);
     if (compRange) {
       const start = compRange.start;
@@ -78,11 +91,11 @@ export class WBHoverProvider implements vscode.HoverProvider {
         const name = document.getText(compRange);
         const cInfo = componentDocs[name] || templateDocs[name];
         if (cInfo) {
-          let mdStr = `**:${name}** — ${cInfo.description}\n\n`;
+          let markdown = `**:${name}** — ${cInfo.description}\n\n`;
           if (cInfo.attributes.length) {
-            mdStr += `**Атрибуты:** ${cInfo.attributes.join(', ')}`;
+            markdown += `**Атрибуты:** ${cInfo.attributes.join(', ')}`;
           }
-          const md = new vscode.MarkdownString(mdStr);
+          const md = new vscode.MarkdownString(markdown);
           md.isTrusted = true;
           return new vscode.Hover(md, compRange);
         }
