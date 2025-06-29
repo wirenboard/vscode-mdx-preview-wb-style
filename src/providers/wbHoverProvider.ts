@@ -54,21 +54,6 @@ Object.values(templateDefs).forEach(def => {
   templateAttributeDocs[name] = docs.attributes || {};
 });
 
-if (templateDocs['article']) {
-  templateDocs['solution']     = templateDocs['article'];
-  templateDocs['article-link'] = templateDocs['article'];
-  templateAttributeDocs['solution']     = templateAttributeDocs['article'];
-  templateAttributeDocs['article-link'] = templateAttributeDocs['article'];
-}
-if (templateDocs['integrator']) {
-  templateDocs['partner'] = {
-    description: 'Партнёр',
-    attributes: [...templateDocs['integrator'].attributes],
-    path: templateDocs['integrator'].path
-  };
-  templateAttributeDocs['partner'] = templateAttributeDocs['integrator'];
-}
-
 export class WBHoverProvider implements vscode.HoverProvider {
   private findWorkspaceRoot(uri: vscode.Uri): string | undefined {
     const folders = vscode.workspace.workspaceFolders;
