@@ -1,112 +1,88 @@
 import * as vscode from 'vscode';
+import componentDefs from '../../snippets/components.json';
+import templateDefs from '../../snippets/templates.json';
 
 interface AttrInfo {
   description: string;
-  default: string;
+  default?: string;
   values?: string[];
 }
 
-const attributeDocs: Record<string, AttrInfo> = {
-  width: {
-    description: 'Ширина компонента (например, "300px" или "50%")',
-    default: '100%',
-    values: ['100px', '200px', '300px', '50%', '100%']
-  },
-  height: {
-    description: 'Высота компонента (например, "200px" или "auto")',
-    default: 'auto',
-    values: ['100px', '200px', 'auto']
-  },
-  src: {
-    description: 'URL изображения или видео',
-    default: ''
-  },
-  caption: {
-    description: 'Подпись к изображению',
-    default: ''
-  },
-  url: {
-    description: 'Ссылка на видео',
-    default: ''
-  },
-  data: {
-    description: 'JSON-массив с данными для галереи',
-    default: '[]'
-  },
-  float: {
-    description: 'Выравнивание компонента',
-    default: 'none',
-    values: ['left', 'right', 'none']
-  }
-};
-
 interface CompInfo {
   description: string;
-  attributes?: string[];
+  attributes: string[];
 }
 
-const componentDocs: Record<string, CompInfo> = {
-  photo: {
-    description: 'Компонент для вставки одиночного фото.',
-    attributes: ['src', 'caption', 'width', 'height', 'float']
-  },
-  gallery: {
-    description: 'Компонент для вставки галереи изображений.',
-    attributes: ['data']
-  },
-  'video-player': {
-    description: 'Компонент видеоплеера.',
-    attributes: ['url', 'width', 'height', 'cover']
-  },
-  'video-gallery': {
-    description: 'Компонент видеогалереи.',
-    attributes: ['data']
-  },
-  spoiler: {
-    description: 'Компонент спойлера.',
-    attributes: ['title']
-  },
-  include: {
-    description: 'Компонент включения внешнего файла.',
-    attributes: ['path']
-  }
-};
+const attributeDocs: Record<string, AttrInfo> = {};
+const componentDocs: Record<string, CompInfo> = {};
 
-export class WBHoverProvider implements vscode.HoverProvider, vscode.CompletionItemProvider {
+
+Object.entries(componentDefs).forEach(([compName, compDef]: [string, any]) => {
+  componentDocs[compName] = {
+    description: compDef.description,
+    attributes: compDef.attributes ? Object.keys(compDef.attributes) : []
+  };
+  if (compDef.attributes) {
+    Object.entries(compDef.attributes).forEach(([attrName, attrDef]: [string, any]) => {
+      attributeDocs[attrName] = {
+        description: attrDef.description,
+        default: attrDef.default,
+        values: attrDef.values
+      };
+    });
+  }
+});
+
+
+const templateDocs: Record<string, CompInfo> = {};
+Object.entries(templateDefs).forEach(([key, tpl]: [string, any]) => {
+  const m = key.match(/^wbs-md-(.+)$/);
+  if (!m) return;
+  const name = m[1];
+  const firstLine = Array.isArray(tpl.body) ? tpl.body[0] : tpl.body;
+
+  const attrs = [...firstLine.matchAll(/(\w+)=/g)].map(([_, attr]) => attr);
+  templateDocs[name] = {
+    description: tpl.description,
+    attributes: attrs
+  };
+});
+
+export class WBHoverProvider implements vscode.HoverProvider {
   provideHover(
     document: vscode.TextDocument,
     position: vscode.Position
   ): vscode.ProviderResult<vscode.Hover> {
-    // 1) Hover по атрибутам
+
     const attrRange = document.getWordRangeAtPosition(position, /[a-zA-Z-]+/);
     if (attrRange) {
       const attr = document.getText(attrRange);
-      const aInfo = attributeDocs[attr];
-      if (aInfo) {
+      const info = attributeDocs[attr];
+      if (info) {
         const md = new vscode.MarkdownString(
-          `**${attr}** — ${aInfo.description}\n\n` +
-          `**Значения:** ${aInfo.values?.join(', ') ?? '—'}  \n` +
-          `**По умолчанию:** ${aInfo.default}`
+          `**${attr}** — ${info.description}\n\n` +
+          `**Значения:** ${info.values?.join(', ') ?? '—'}  \n` +
+          `**По умолчанию:** ${info.default ?? '—'}`
         );
         md.isTrusted = true;
         return new vscode.Hover(md, attrRange);
       }
     }
 
-    // 2) Hover по самому компоненту — слово должно идти после ":"
+
     const compRange = document.getWordRangeAtPosition(position, /[a-z][\w-]*/i);
     if (compRange) {
       const start = compRange.start;
       const line = document.lineAt(start.line).text;
       if (start.character > 0 && line[start.character - 1] === ':') {
         const name = document.getText(compRange);
-        const cInfo = componentDocs[name];
+        const cInfo = componentDocs[name] || templateDocs[name];
         if (cInfo) {
-          let markdown = `**:${name}** — ${cInfo.description}\n\n`;
-          if (cInfo.attributes) {
-            markdown += `**Атрибуты:** ${cInfo.attributes.join(', ')}`;
+          let mdStr = `**:${name}** — ${cInfo.description}\n\n`;
+          if (cInfo.attributes.length) {
+            mdStr += `**Атрибуты:** ${cInfo.attributes.join(', ')}`;
           }
-          const md = new vscode.MarkdownString(markdown);
+          const md = new vscode.MarkdownString(mdStr);
           md.isTrusted = true;
           return new vscode.Hover(md, compRange);
         }
@@ -114,22 +90,5 @@ export class WBHoverProvider implements vscode.HoverProvider, vscode.CompletionI
     }
 
     return;
-  }
-
-  provideCompletionItems(
-    document: vscode.TextDocument,
-    position: vscode.Position
-  ): vscode.ProviderResult<vscode.CompletionItem[]> {
-    const line = document.lineAt(position).text.substr(0, position.character);
-    const m = line.match(/(\w+)\s*=\s*['"]([^'"]*)$/);
-    if (!m) return;
-    const attr = m[1];
-    const info = attributeDocs[attr];
-    if (!info?.values) return;
-    return info.values.map(val => {
-      const item = new vscode.CompletionItem(val, vscode.CompletionItemKind.Value);
-      item.insertText = val;
-      return item;
-    });
   }
 }
