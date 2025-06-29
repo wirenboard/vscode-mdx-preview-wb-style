@@ -8,19 +8,22 @@ export function activate(context: vscode.ExtensionContext) {
   const webviewManager = new WebviewManager(context);
   webviewManager.initialize();
 
-    context.subscriptions.push(
-        // автодополнение компонент/атрибутов
-        vscode.languages.registerCompletionItemProvider(
-          { language: 'markdown', scheme: 'file' },
-          new WBCompletionProvider(),
-          ':' // триггер по двоеточию
-        ),
-        // hover-подсказки для атрибутов и компонентов
-        vscode.languages.registerHoverProvider(
-          { language: 'markdown', scheme: 'file' },
-          new WBHoverProvider()
-        )
-      ); 
+  context.subscriptions.push(
+    // автодополнение компонент/атрибутов
+    vscode.languages.registerCompletionItemProvider(
+      { language: 'markdown', scheme: 'file' },
+      new WBCompletionProvider(),
+      ':' // триггер по двоеточию
+    ),
+    // hover-подсказки для атрибутов и компонентов
+    vscode.languages.registerHoverProvider(
+      [
+        { language: 'markdown', scheme: 'file' },
+        { language: 'yaml', scheme: 'file' }
+      ],
+      new WBHoverProvider()
+    )
+  );
 }
 
 export function deactivate() { }
