@@ -16,7 +16,6 @@ interface TemplateInfo extends CompInfo {
   path?: string;
 }
 
-// Преобразуем glob-паттерн в RegExp: ** → .*, * → [^/]* 
 function globToRegExp(glob: string): RegExp {
   const parts = glob.replace(/\\/g, '/').split('/').map(part => {
     if (part === '**') return '.*';
@@ -26,13 +25,11 @@ function globToRegExp(glob: string): RegExp {
   return new RegExp('^' + parts.join('/') + '$');
 }
 
-// Документация компонентов и шаблонов
 const componentDocs:        Record<string,CompInfo>            = {};
 const componentAttributeDocs:Record<string,Record<string,AttrInfo>> = {};
 const templateDocs:         Record<string,TemplateInfo>        = {};
 const templateAttributeDocs:Record<string,Record<string,AttrInfo>> = {};
 
-// Загрузка компонентов
 Object.values(componentDefs).forEach(def => {
   const { description, docs } = def as any;
   const bodyLines = Array.isArray(def.body) ? def.body : [def.body];
@@ -44,7 +41,6 @@ Object.values(componentDefs).forEach(def => {
   componentAttributeDocs[name] = docs.attributes || {};
 });
 
-// Загрузка шаблонов
 Object.values(templateDefs).forEach(def => {
   const { description, docs } = def as any;
   const mName = /^wbs-md-(.+)$/.exec(def.prefix as string);
@@ -58,7 +54,6 @@ Object.values(templateDefs).forEach(def => {
   templateAttributeDocs[name] = docs.attributes || {};
 });
 
-// Объединяем похожие шаблоны
 if (templateDocs['article']) {
   templateDocs['solution']     = templateDocs['article'];
   templateDocs['article-link'] = templateDocs['article'];
@@ -95,60 +90,80 @@ export class WBHoverProvider implements vscode.HoverProvider {
     return false;
   }
 
+  private resolveTemplateType(relPath: string): string | undefined {
+    const cleanPath = relPath.replace(/^\/|\/$/g, '');
+    const pathParts = cleanPath.split('/');
+
+        for (const [name, info] of Object.entries(templateDocs)) {
+      if (!info.path) continue;
+
+      const pattern = info.path
+        .replace(/^\/|\/$/g, '')
+        .replace(/^\*\*\//, '')
+        .replace(/\/\*\*$/, '');
+      const patternParts = pattern.split('/');
+      const lastPatternIndex = patternParts.length - 1;
+
+      for (let i = 0; i <= pathParts.length - patternParts.length; i++) {
+        let matches = true;
+
+        for (let j = 0; j < patternParts.length; j++) {
+          const pathPart = pathParts[i + j];
+          const patternPart = patternParts[j];
+
+          if (!globToRegExp(patternPart).test(pathPart)) {
+            matches = false;
+            break;
+        }
+      }
+
+      if (matches) return name;
+      }
+    }
+    return undefined;
+      }
+
   provideHover(
     document: vscode.TextDocument,
     position: vscode.Position
   ): vscode.ProviderResult<vscode.Hover> {
-    // Frontmatter
     const fmEnd = this.findFrontmatterEnd(document);
     if (fmEnd > 0 && position.line > 0 && position.line <= fmEnd) {
-      let tplName: string | undefined;
+        const range = document.getWordRangeAtPosition(position, /[\w-]+(?=\s*:)/);
+      if (!range) return;
+
+          const key = document.getText(range);
       const root = this.findWorkspaceRoot(document.uri);
+      let tplName: string | undefined;
       if (root) {
         const rel = path.relative(root, document.uri.fsPath).replace(/\\/g, '/');
-        for (const [name, info] of Object.entries(templateDocs)) {
-          if (info.path && globToRegExp(info.path).test(rel)) {
-            tplName = name;
-            break;
-          }
+        tplName = this.resolveTemplateType(rel);
         }
-      }
-      if (!tplName && !this.hasBodyContent(document, fmEnd)) {
-        tplName = 'video';
-      }
-      if (!tplName) {
-        const keys: string[] = [];
-        for (let i = 1; i <= fmEnd; i++) {
-          const m = /^([\w-]+)\s*:/.exec(document.lineAt(i).text);
-          if (m) keys.push(m[1]);
-        }
-        let best = 0;
-        for (const [name, info] of Object.entries(templateDocs)) {
-          const score = info.attributes.filter(a => keys.includes(a)).length;
-          if (score > best) { best = score; tplName = name; }
-        }
-      }
-      if (tplName) {
-        const range = document.getWordRangeAtPosition(position, /[\w-]+(?=\s*:)/);
-        if (range) {
-          const key = document.getText(range);
-          const info = templateAttributeDocs[tplName][key];
-          if (info) {
-            const possible = Array.isArray(info.values) ? info.values.join(', ') : '—';
-            const md = new vscode.MarkdownString(
-              `**${key}** — ${info.description}\n\n` +
-              `**Возможные значения:** ${possible}  \n` +
-              `**По умолчанию:** ${info.default ?? '—'}`
-            );
-            md.isTrusted = true;
-            return new vscode.Hover(md, range);
-          }
-        }
-      }
-      return;
-    }
 
-    // Component attribute hover
+      if (tplName) {
+        const info = templateAttributeDocs[tplName]?.[key];
+        if (info) {
+          const possible = Array.isArray(info.values) ? info.values.join(', ') : '—';
+          const md = new vscode.MarkdownString(
+            `**${key}** — ${info.description}\n\n` +
+            `**Возможные значения:** ${possible}  \n` +
+            `**По умолчанию:** ${info.default ?? '—'}`
+          );
+          md.isTrusted = true;
+          return new vscode.Hover(md, range);
+        }
+    return;
+  }
+
+      const md = new vscode.MarkdownString(
+        `⚠️ Не удалось определить тип документа\n\n` +
+        `Проверьте что файл находится в одной из поддерживаемых директорий:\n` +
+        `- articles/\n- solutions/\n- integrators/\n- jobs/include/`
+      );
+      md.isTrusted = true;
+      return new vscode.Hover(md, range);
+}
+
     const attrRange = document.getWordRangeAtPosition(position, /[A-Za-z-]+(?=\=)/);
     if (attrRange) {
       let compName: string | undefined;
@@ -172,7 +187,6 @@ export class WBHoverProvider implements vscode.HoverProvider {
       }
     }
 
-    // Component name hover
     const compRange = document.getWordRangeAtPosition(position, /[a-z][\w-]*/i);
     if (compRange) {
       const before = document.lineAt(compRange.start.line).text.charAt(compRange.start.character - 1);
