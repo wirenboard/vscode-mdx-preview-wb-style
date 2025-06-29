@@ -15,7 +15,8 @@
     "Visualization"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "onStartupFinished",
+    "onLanguage:markdown"
   ],
   "main": "./out/extension.js",
   "scripts": {
@@ -56,6 +57,20 @@
         "language": "markdown",
         "path": "./snippets/markdown.json"
       }
-    ]
+    ],
+    "languages": [{
+      "id": "markdown",
+      "embeddedLanguages": {
+        "meta.component.wb": "source.wb-components"
+      }
+    }],
+       "grammars": [
+           {
+             "language": "markdown",
+             "scopeName": "text.md.wb-components",
+             "path": "./syntaxes/wb-components.tmLanguage.json",
+             "injectTo": ["text.html.markdown"]
+           }
+         ]
   }
 }

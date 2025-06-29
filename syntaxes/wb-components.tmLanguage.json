@@ -1,0 +1,30 @@
+{
+    "scopeName": "text.md.wb-components",
+    "injectionSelector": "L:text.html.markdown",
+    "patterns": [
+        {
+            "begin": "(:\\w+)\\{",
+            "end": "\\}",
+            "name": "meta.component.wb",
+            "beginCaptures": {
+                "1": {
+                    "name": "entity.name.tag.html"
+                }
+            },
+            "patterns": [
+                {
+                    "match": "(\\w+)\\s*=",
+                    "name": "entity.other.attribute-name.html"
+                },
+                {
+                    "match": "\"(.*?)\"|'(.*?)'",
+                    "name": "string.quoted.double.markdown"
+                },
+                {
+                    "match": "\\[([^\\]]+)\\]",
+                    "name": "constant.array.wb"
+                }
+            ]
+        }
+    ]
+}
