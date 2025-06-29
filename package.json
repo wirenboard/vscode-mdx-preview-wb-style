@@ -56,7 +56,15 @@
       {
         "language": "markdown",
         "path": "./snippets/markdown.json"
-      }
+      },
+      {
+        "language": "markdown",
+        "path": "./snippets/components.json"
+      },
+      {
+        "language": "markdown",
+        "path": "./snippets/templates.json"
+      }            
     ],
     "languages": [{
       "id": "markdown",
