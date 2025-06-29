@@ -90,6 +90,13 @@ export class WBHoverProvider implements vscode.HoverProvider {
     return false;
   }
 
+  private getAllowedPaths(): string[] {
+    return Object.values(templateDocs)
+      .map(t => t.path?.replace(/\/\*\*$/, '').replace(/^\*\*\//, '') || '')
+      .filter(Boolean)
+      .filter((v, i, a) => a.indexOf(v) === i);
+  }
+
   private resolveTemplateType(relPath: string): string | undefined {
     const cleanPath = relPath.replace(/^\/|\/$/g, '');
     const pathParts = cleanPath.split('/');
@@ -155,10 +162,16 @@ export class WBHoverProvider implements vscode.HoverProvider {
     return;
   }
 
+      const relPath = root
+        ? path.relative(root, document.uri.fsPath).replace(/\\/g, '/')
+        : 'unknown';
+      const allowedPaths = this.getAllowedPaths();
+
       const md = new vscode.MarkdownString(
         `⚠️ Не удалось определить тип документа\n\n` +
-        `Проверьте что файл находится в одной из поддерживаемых директорий:\n` +
-        `- articles/\n- solutions/\n- integrators/\n- jobs/include/`
+        `**Путь:** ${relPath}\n` +
+        `**Допустимые директории:**\n${allowedPaths.map(p => `- ${p}`).join('\n')}\n\n` +
+        `Проверьте расположение файла и path-паттерны в шаблонах`
       );
       md.isTrusted = true;
       return new vscode.Hover(md, range);
