@@ -10,24 +10,26 @@
         "}"
       ],
       "description": "Компонент фото. caption можно не указывать",
-      "attributes": {
-        "src": {
-          "description": "URL изображения",
-          "default": ""
-        },
-        "caption": {
-          "description": "Подпись к изображению",
-          "default": ""
-        },
-        "width": {
-          "description": "Ширина изображения (например, \"300px\" или \"50%\")",
-          "default": "300px",
-          "values": ["100px", "200px", "300px", "50%", "100%"]
-        },
-        "float": {
-          "description": "Выравнивание изображения",
-          "default": "center",
-          "values": ["right", "left", "center"]
+      "docs": {
+        "attributes": {
+          "src": {
+            "description": "URL изображения",
+            "default": ""
+          },
+          "caption": {
+            "description": "Подпись к изображению",
+            "default": ""
+          },
+          "width": {
+            "description": "Ширина изображения (например, \"300px\" или \"50%\")",
+            "default": "300px",
+            "values": ["100px", "200px", "300px", "50%", "100%"]
+          },
+          "float": {
+            "description": "Выравнивание изображения",
+            "default": "center",
+            "values": ["right", "left", "center"]
+          }
         }
       }
     },
@@ -50,48 +52,52 @@
         "}"
       ],
       "description": "Галерея изображений. Подпись можно не указывать.",
-      "attributes": {
-        "data": {
-          "description": "JSON-массив данных для галереи",
-          "default": "[]"
+      "docs": {
+        "attributes": {
+          "data": {
+            "description": "JSON-массив данных для галереи",
+            "default": "[]"
+          }
         }
       }
     },
-    "WB Component Video": {
-      "prefix": "wbs-comp-video",
+    "WB Component Video Player": {
+      "prefix": "wbs-comp-video-player",
       "body": [
         ":video-player{",
         "  url=\"${1:URL}\"",
         "  ${2:width=\"500px\"}",
         "  ${3:height=\"280px\"}",
         "  ${4:float=\"${5|left,right|}\"}",
-        "  ${6:cover=\"\"}",
+        "  ${5:cover=\"\"}",
         "}"
       ],
       "description": "Компонент видеоплеера.",
-      "attributes": {
-        "url": {
-          "description": "Ссылка на видео",
-          "default": ""
-        },
-        "width": {
-          "description": "Ширина плеера",
-          "default": "500px",
-          "values": ["300px", "400px", "500px", "100%"]
-        },
-        "height": {
-          "description": "Высота плеера",
-          "default": "280px",
-          "values": ["200px", "280px", "360px"]
-        },
-        "float": {
-          "description": "Выравнивание плеера",
-          "default": "left",
-          "values": ["left", "right", "center"]
-        },
-        "cover": {
-          "description": "URL обложки видео",
-          "default": ""
+      "docs": {
+        "attributes": {
+          "url": {
+            "description": "Ссылка на видео",
+            "default": ""
+          },
+          "width": {
+            "description": "Ширина плеера",
+            "default": "500px",
+            "values": ["300px", "400px", "500px", "100%"]
+          },
+          "height": {
+            "description": "Высота плеера",
+            "default": "280px",
+            "values": ["200px", "280px", "360px"]
+          },
+          "float": {
+            "description": "Выравнивание плеера",
+            "default": "left",
+            "values": ["left", "right", "center"]
+          },
+          "cover": {
+            "description": "URL обложки видео",
+            "default": ""
+          }
         }
       }
     },
@@ -110,10 +116,12 @@
         "}"
       ],
       "description": "Видеогалерея. Подпись можно не указывать.",
-      "attributes": {
-        "data": {
-          "description": "JSON-массив данных для видеогалереи",
-          "default": "[]"
+      "docs": {
+        "attributes": {
+          "data": {
+            "description": "JSON-массив данных для видеогалереи",
+            "default": "[]"
+          }
         }
       }
     }

@@ -10,42 +10,45 @@
         "author: \"${5:Команда Wiren Board}\"",
         "---",
         "",
-        "[Список категорий для статей (посмотреть и удалить)](../../../common/article_categories.ts)",
-        "[Справочник по синтаксису (посмотреть и удалить)](../../../doc/syntax.md)",
+        "[Список категорий для статей](../../../common/article_categories.ts)",
+        "[Справочник по синтаксису](../../../doc/syntax.md)",
         "",
-        "## ${6:Заголовок 2}",
+        "## ${6:Заголовок}",
         "${7:Текст статьи}",
         "",
-        "### ${8:Подзаголовок 3}",
+        "### ${8:Подзаголовок}",
         "${9:Дополнительный текст}",
         "",
-        "## ${10:Заголовок 2}",
+        "## ${10:Заголовок}",
         "${11:Текст статьи}",
         "",
-        "### ${12:Подзаголовок 3}",
+        "### ${12:Подзаголовок}",
         "${13:Дополнительный текст}"
       ],
       "description": "Шаблон статьи с ссылками и структурой из 2 разделов",
-      "attributes": {
-        "title": {
-          "description": "Заголовок статьи",
-          "default": ""
-        },
-        "cover": {
-          "description": "Путь к обложке статьи",
-          "default": ""
-        },
-        "date": {
-          "description": "Дата публикации в формате YYYY-MM-DD",
-          "default": ""
-        },
-        "category": {
-          "description": "Категория статьи",
-          "default": ""
-        },
-        "author": {
-          "description": "Автор статьи",
-          "default": ""
+      "docs": {
+        "path": "articles/**",
+        "attributes": {
+          "title": {
+            "description": "Заголовок статьи",
+            "default": ""
+          },
+          "cover": {
+            "description": "Путь к обложке статьи",
+            "default": ""
+          },
+          "date": {
+            "description": "Дата публикации (YYYY-MM-DD)",
+            "default": ""
+          },
+          "category": {
+            "description": "Категория статьи",
+            "default": ""
+          },
+          "author": {
+            "description": "Автор статьи",
+            "default": ""
+          }
         }
       }
     },
@@ -53,31 +56,34 @@
       "prefix": "wbs-md-article-link",
       "body": [
         "---",
-        "title: \"${1:Лаконичный заголовок}\"",
+        "title: \"${1:Заголовок}\"",
         "cover: \"${2:my_article/my_article.jpg}\"",
         "date: \"${3:2023-11-15}\"",
         "category: \"${4:educational}\"",
         "---",
         "",
-        "[Список категорий для статей (посмотреть и удалить)](../../../common/article_categories.ts)"
+        "[Список категорий для статей](../../../common/article_categories.ts)"
       ],
-      "description": "Шаблон ссылки на статью, например, на Хабр",
-      "attributes": {
-        "title": {
-          "description": "Заголовок",
-          "default": ""
-        },
-        "cover": {
-          "description": "Путь к обложке",
-          "default": ""
-        },
-        "date": {
-          "description": "Дата в формате YYYY-MM-DD",
-          "default": ""
-        },
-        "category": {
-          "description": "Категория",
-          "default": ""
+      "description": "Укороченный шаблон статьи (без author)",
+      "docs": {
+        "path": "articles/**",
+        "attributes": {
+          "title": {
+            "description": "Заголовок",
+            "default": ""
+          },
+          "cover": {
+            "description": "Путь к обложке",
+            "default": ""
+          },
+          "date": {
+            "description": "Дата (YYYY-MM-DD)",
+            "default": ""
+          },
+          "category": {
+            "description": "Категория",
+            "default": ""
+          }
         }
       }
     },
@@ -85,45 +91,38 @@
       "prefix": "wbs-md-solution",
       "body": [
         "---",
-        "title: \"${1:Лаконичный заголовок}\"",
+        "title: \"${1:Заголовок}\"",
         "cover: \"${2:my_solution/my_solution.jpg}\"",
-        "date: \"${3:2023-01-21}\"",
+        "date: \"${3:2024-01-21}\"",
         "category: \"${4:shops_restaurants_monitoring}\"",
         "---",
         "",
-        "[Список категорий для решений (посмотреть и удалить)](../../../common/solution_categories.ts)",
-        "[Справочник по синтаксису (посмотреть и удалить)](../../../doc/syntax.md)",
+        "[Список категорий для решений](../../../common/solution_categories.ts)",
+        "[Справочник по синтаксису](../../../doc/syntax.md)",
         "",
         "## ${5:О компании}",
-        "${6:Краткое описание компании и её деятельности}",
-        "",
-        "## ${7:Задачи и проблемы}",
-        "${8:Основные вызовы, с которыми столкнулся клиент}",
-        "",
-        "## ${9:Решение}",
-        "${10:Описание реализованного решения и его ключевых компонентов}",
-        "",
-        "## Преимущества",
-        "",
-        "## Дополнительные материалы"
+        "${6:Описание компании}"
       ],
-      "description": "Шаблон внедрения с разделами Преимущества и Дополнительные материалы",
-      "attributes": {
-        "title": {
-          "description": "Заголовок решения",
-          "default": ""
-        },
-        "cover": {
-          "description": "Путь к обложке решения",
-          "default": ""
-        },
-        "date": {
-          "description": "Дата в формате YYYY-MM-DD",
-          "default": ""
-        },
-        "category": {
-          "description": "Категория решения",
-          "default": ""
+      "description": "Шаблон решения (аналог статьи)",
+      "docs": {
+        "path": "solutions/**",
+        "attributes": {
+          "title": {
+            "description": "Заголовок решения",
+            "default": ""
+          },
+          "cover": {
+            "description": "Путь к обложке",
+            "default": ""
+          },
+          "date": {
+            "description": "Дата (YYYY-MM-DD)",
+            "default": ""
+          },
+          "category": {
+            "description": "Категория решения",
+            "default": ""
+          }
         }
       }
     },
@@ -141,179 +140,44 @@
         "email: \"${9:contact@example.com}\"",
         "---",
         "",
-        "${10:Описание компании в формате Markdown}"
+        "${10:Описание компании}"
       ],
-      "description": "Шаблон карточки интегратора",
-      "attributes": {
-        "district": {
-          "description": "Регион интегратора",
-          "default": ""
-        },
-        "tags": {
-          "description": "Теги интегратора",
-          "default": ""
-        },
-        "coordinates": {
-          "description": "Координаты в формате [lat, lon]",
-          "default": ""
-        },
-        "title": {
-          "description": "Название интегратора",
-          "default": ""
-        },
-        "logo": {
-          "description": "Путь к логотипу",
-          "default": ""
-        },
-        "phone": {
-          "description": "Контактный телефон",
-          "default": ""
-        },
-        "website": {
-          "description": "Сайт интегратора",
-          "default": ""
-        },
-        "email": {
-          "description": "Email интегратора",
-          "default": ""
-        }
-      }
-    },
-    "WB Partner Template": {
-      "prefix": "wbs-md-partner",
-      "body": [
-        "---",
-        "title: \"${1:Название партнёра}\"",
-        "logo: \"${2:my_partner/logo.png}\"",
-        "phone: \"${3:74993227329}\"",
-        "website: \"${4:example.com}\"",
-        "email: \"${5:contact@example.com}\"",
-        "---",
-        "",
-        "${6:Описание компании в формате Markdown}"
-      ],
-      "description": "Шаблон карточки партнёра",
-      "attributes": {
-        "title": {
-          "description": "Название партнёра",
-          "default": ""
-        },
-        "logo": {
-          "description": "Путь к логотипу",
-          "default": ""
-        },
-        "phone": {
-          "description": "Телефон партнёра",
-          "default": ""
-        },
-        "website": {
-          "description": "Сайт партнёра",
-          "default": ""
-        },
-        "email": {
-          "description": "Email партнёра",
-          "default": ""
-        }
-      }
-    },
-    "WB Page Template": {
-      "prefix": "wbs-md-page",
-      "body": [
-        "---",
-        "title: \"${1:Заголовок страницы}\"",
-        "---",
-        "",
-        "[Справочник по синтаксису (посмотреть и удалить)](../../../doc/syntax.md)",
-        "",
-        "## ${2:Подзаголовок}",
-        "${3:Основной текст}",
-        "",
-        "### ${4:Подподзаголовок}",
-        "${5:Дополнительный текст}"
-      ],
-      "description": "Шаблон произвольной страницы с базовой структурой",
-      "attributes": {
-        "title": {
-          "description": "Заголовок страницы",
-          "default": ""
-        }
-      }
-    },
-    "WB Vacancy Template": {
-      "prefix": "wbs-md-vacancy",
-      "body": [
-        "---",
-        "actual: ${1:true/false}",
-        "---",
-        "",
-        "::vacancy",
-        "#title",
-        "${2:Название вакансии}",
-        "#salary",
-        "${3:Зарплатная вилка (например 170 000 — 300 000 ₽/мес)}",
-        "#description",
-        "${4:Базовое описание вакансии}",
-        "#goals",
-        "${5:Задачи кандидата}",
-        "* ${6:Пункт 1}",
-        "* ${7:Пункт 2}",
-        "#requirements",
-        "${8:Основные требования}",
-        "* ${9:Пункт 1}",
-        "* ${10:Пункт 2}",
-        "#advantage",
-        "${11:Дополнительные плюсы}",
-        "* ${12:Пункт 1}",
-        "* ${13:Пункт 2}",
-        "#conditions",
-        "${14:Условия работы}",
-        "* ${15:Пункт 1}",
-        "* ${16:Пункт 2}",
-        "::"
-      ],
-      "description": "Шаблон вакансии с обязательными разделами",
-      "attributes": {
-        "actual": {
-          "description": "Публиковать вакансию (true/false)",
-          "default": ""
-        }
-      }
-    },
-    "WB Video Template": {
-      "prefix": "wbs-md-video",
-      "body": [
-        "---",
-        "title: \"${1:Лаконичный заголовок}\"",
-        "url: \"${2:URL}\"",
-        "date: \"${3:2023-01-21}\"",
-        "category: \"${4:educational}\"",
-        "cover: \"${5:my_video/my_video.webp}\"",
-        "---",
-        "",
-        "[Список категорий для видео (посмотреть и удалить)](../../../common/video_categories.ts)",
-        "[Справочник по синтаксису (посмотреть и удалить)](../../../doc/syntax.md)"
-      ],
-      "description": "Шаблон карточки видео с обязательными метаданными",
-      "attributes": {
-        "title": {
-          "description": "Заголовок видео из справки",
-          "default": ""
-        },
-        "url": {
-          "description": "Ссылка на видео",
-          "default": ""
-        },
-        "date": {
-          "description": "Дата публикации (YYYY-MM-DD)",
-          "default": ""
-        },
-        "category": {
-          "description": "Категория видео",
-          "default": ""
-        },
-        "cover": {
-          "description": "Путь к обложке видео",
-          "default": ""
+      "description": "Шаблон интегратора",
+      "docs": {
+        "path": "integrators/**",
+        "attributes": {
+          "district": {
+            "description": "Регион интегратора",
+            "default": ""
+          },
+          "tags": {
+            "description": "Теги интегратора",
+            "default": ""
+          },
+          "coordinates": {
+            "description": "Координаты [lat, lon]",
+            "default": ""
+          },
+          "title": {
+            "description": "Название интегратора",
+            "default": ""
+          },
+          "logo": {
+            "description": "Путь к логотипу",
+            "default": ""
+          },
+          "phone": {
+            "description": "Контактный телефон",
+            "default": ""
+          },
+          "website": {
+            "description": "Сайт интегратора",
+            "default": ""
+          },
+          "email": {
+            "description": "Email интегратора",
+            "default": ""
+          }
         }
       }
     }
